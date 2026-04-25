@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12",
+    "@tailwindcss/postcss": "4.2.4",
+    "@types/node": "24.12.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "lefthook": "2.1.6",
+    "tailwindcss": "4.2.4",
+    "typescript": "6.0.3",
+    "ultracite": "7.6.1"
+  },
+  "name": "echa",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
+    "prepare": "lefthook install"
+  },
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.33.2",
+  "private": true
+}
