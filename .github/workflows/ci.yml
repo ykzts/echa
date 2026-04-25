@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+
+jobs:
+  # Install dependencies job (shared cache for all Node.js jobs)
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          run_install: true
+          cache: true
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    needs: install
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          run_install: true
+          cache: true
+      - name: Run Node.js lint
+        run: pnpm check
+
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    needs: install
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
+        with:
+          run_install: true
+          cache: true
+      - run: pnpm build
+
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-24.04
+    needs: [lint, build]
+    if: always()
+    steps:
+      - name: Check lint results
+        if: needs.lint.result != 'success'
+        run: |
+          echo "Lint job failed"
+          exit 1
+
+      - name: Check build results
+        if: needs.build.result != 'success'
+        run: |
+          echo "Build job failed"
+          exit 1
+
+      - name: All jobs passed
+        run: echo "All jobs passed successfully!"
