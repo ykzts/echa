@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
+
       - name: Setup pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
         with:
@@ -35,6 +36,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
+
       - name: Setup pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
         with:
@@ -42,6 +44,16 @@ jobs:
           cache: true
       - name: Run Node.js lint
         run: pnpm check
+
+      - name: Check for ungenerated Drizzle migrations
+        run: |
+          pnpm db:generate
+          if [[ -n $(git status --porcelain migrations/) ]]; then
+            echo "Error: Database schema has changed but migrations were not generated."
+            echo "Please run 'pnpm db:generate' locally and commit the changes."
+            git diff migrations/
+            exit 1
+          fi
 
   build:
     name: Build
@@ -54,11 +66,13 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
+
       - name: Setup pnpm
         uses: pnpm/action-setup@903f9c1a6ebcba6cf41d87230be49611ac97822e # v6.0.3
         with:
           run_install: true
           cache: true
+
       - run: pnpm build
 
   ci-summary:
